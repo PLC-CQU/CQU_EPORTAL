@@ -22,7 +22,7 @@ pip3 install socket
 ##### 2. 执行下面的命令（用户名和密码建议带上单引号， 防止密码中的字符在shell中有特殊含义）
 
 ```shell
-git clone https://gitee.com/nullzx/cqu_web_login.git  ~/cqu_web_login
+git clone https://github.com/PLC-CQU/CQU_EPORTAL  ~/cqu_web_login
 ```
 
 * login
