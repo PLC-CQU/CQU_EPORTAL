@@ -4,15 +4,16 @@ import urllib.parse
 import subprocess
 import psutil
 import socket
+import platform
 
 """
     This script is used to login/logout the eportal system.
-    The key to the success of the login/logout operation is 
-    to get the correct login and logout urls.
+    The key to the success of the login/logout operation is
+    to get the correct login and logout URLS.
 
     To facilitate the quick update of the script's login/logout
-    urls when the url address and parameters are changed on the 
-    server side, we recommend to confer to the following guide:
+    URLS when the URL address and parameters are changed on the
+    server side, we recommend referring to the following guide:
     How-to-obtain-the-eportal-urls.md
 """
 
@@ -38,6 +39,7 @@ def login(username, password, ip):
           "&jsVersion=4.2"\
           "&terminal_type=1" \
           "&lang=en".format(username, password, ip)
+    # print(real_login_url)
     response = requests.get(real_login_url)
     return response.text
 
@@ -60,10 +62,35 @@ def logout(ip):
           "&wlan_ac_name="\
           "&jsVersion=4.2"\
           "&lang=en".format(ip)
+    # print(real_logout_url)
     response = requests.get(real_logout_url)
     return response.text
 
 def get_default_interface_name():
+    system = platform.system()
+    if system == "Windows":
+        return None
+    elif system == "Darwin":
+        return get_default_interface_name_for_macos()
+    elif system == "Linux":
+        return get_default_interface_name_for_linux()
+    else:
+        return None
+
+def get_default_interface_name_for_macos():
+    command = 'route get default'
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode == 0:
+        # Parse the output to get the default interface name
+        for line in result.stdout.splitlines():
+            if "interface:" in line:  # find the line with default route
+                # get the line like 'interface: en0'
+                parts = line.split()
+                if len(parts) == 2:
+                    return parts[1]  # return the interface name
+    return None
+
+def get_default_interface_name_for_linux():
     # Command to get routing table under Linux
     command = 'ip route show'
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
